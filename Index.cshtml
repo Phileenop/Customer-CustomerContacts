@@ -1,0 +1,245 @@
+﻿
+
+@using CustomerContactManager.Models;
+
+
+<div>
+    <h1>All Customers</h1>
+    <br/>
+    <input type="button" id="btnDisplayAll" name="btnDisplayAll" onclick="displayAll()" value="Display All Customer Coordinates" class="btn btn-info" />
+    <br/>
+    <br/>
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3" >
+            <ul id="customersNameUl"></ul>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+            <ul id="customersLatitudeUl"></ul>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+            <ul id="customersLongitudeUl"></ul>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2">
+            <ul id="customersEditButton" ></ul>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4 col-xs-1">
+           
+        </div>
+    </div>
+   <h2>Use the drop down list to view customer contact details</h2>
+    <select id="customers" onchange="findByDropDownList()" >
+    </select>
+    <br/>
+    <br/>
+    <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+            <ul id="lblName"></ul>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+            <ul id="lblEmail"></ul>
+        </div>
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-3">
+            <ul id="lblContactNumber"></ul>
+        </div>
+        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-3">
+
+        </div>
+    </div>
+   
+</div>
+    <h2>Use the drop down list below to edit a user</h2>
+<select id="customersForEdit" onchange="editByDropDownList()">
+    
+</select>
+<br/>
+<br />
+<div>
+   
+    <label for="txtCustomerName">Name</label>
+    <input type="text" name="txtCustomerName" id="txtCustomerName" />
+    <label for="txtCustomerLatitude">Latitude</label>
+    <input type="text" name="txtCustomerLatitude" id="txtCustomerLatitude" />
+    <label for="txtCustomerLongitude">Longitude</label>
+    <input type="text" name="txtCustomerLongitude" id="txtCustomerLongitude" />
+    <input type="text" name="hdnCustomersId" id="hdnCustomersId" />
+    <input type="button" id="customersEditButton" name="customersEditButton" value="Edit User" class="btn btn-info" onclick="editCustomer()" />
+    
+</div>
+
+
+<div hidden>
+    <h2>Search by ID</h2>
+    <input type="text" id="customerId" size="5" />
+    <input type="button" value="Search" onclick="findById();" class="btn btn-info" />
+    <p id="customer" />
+</div>
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.0.3.min.js"></script>
+<script>
+    var customerUri = 'api/Customers';
+    var customerContactUri = 'api/CustomerContacts';
+    var customerContactListUri = 'api/CustomerContacts/GetCustomerContacts';
+    var idtest = $('hdnCustomersId').val();
+console.log(idtest)
+   // var isCustomersEdit=false;
+
+    function displayAll() {
+        $("#customersNameUl").empty();
+        $("#customersLatitudeUl").empty();
+        $("#customersLongitudeUl").empty();
+        $("#customersEditButton").empty();
+        // Send an AJAX request
+        $.getJSON(customerUri)
+            .done(function (data) {
+                // On success, 'data' contains a list of customers.
+                $.each(data, function (key, item) {
+                    // Add a list item for the product.
+                    $('<li>', { text: item.Name }).appendTo($('#customersNameUl'));
+                    $('<li>', { text: item.Latitude }).appendTo($('#customersLatitudeUl'));
+                    $('<li>', { text: item.Longitude }).appendTo($('#customersLongitudeUl'));
+                   // $('<li>').attr('id', 'liEditUser' + item.Id.toString()).appendTo($('#customersEditButton'));
+                  //  $('<input type="button" value="Edit" class="btn btn-info" onclick="getUser(item.Name)" />').attr('id', 'btnEditUser' + item.Id.toString()).appendTo($('#liEditUser' + item.Id.toString()));
+                   // $('btnEditUser' + item.Id.toString()).on("click", txtCustomerName, item.Name, function () { this.getUser(item) });
+                });
+            });
+    }
+
+/*    $("h2").on("click", "p.test", function () {
+        alert($(this).text());
+    });
+
+    function getUser(name) {
+        $('#txtCustomerName').text(item.Name);
+        txtCustomerName.value = item.Name;
+        txtCustomerLatitude.innerHTML = latitude;
+        txtCustomerLongitude.innerHTML = longitude;
+        hiddenId.innerHTML = Id;
+    } */
+ /*   $(document).ready(function () {
+      // Send an AJAX request
+      $.getJSON(customerUri)
+          .done(function (data) {
+            // On success, 'data' contains a list of customers.
+            $.each(data, function (key, item) {
+              // Add a list item for the product.
+              $('<li>', { text: formatItem(item) }).appendTo($('#customers'));
+            });
+          });
+    });*/
+
+    $(document).ready(function () {
+        $("#customers").empty();
+        $('<option>', { text: '--Please select a customer --', value: 0 }).appendTo($('#customers'));
+        // Send an AJAX request
+        $.getJSON(customerUri)
+            .done(function (data) {
+                // On success, 'data' contains a list of customers.
+                $.each(data, function (key, item) {
+                    // Add a list item for the product.
+                    $('<option>', { text: formatddlItems(item),value:item.Id }).appendTo($('#customers'));
+                });
+            });
+    });
+
+    $(document).ready(function () {
+        $("#customersForEdit").empty();
+        $('<option>', { text: '--Please select a customer --', value: 0 }).appendTo($('#customersForEdit'));
+        // Send an AJAX request
+        $.getJSON(customerUri)
+            .done(function (data) {
+                // On success, 'data' contains a list of customers.
+                $.each(data, function (key, item) {
+                    // Add a list item for the product.
+                    $('<option>', { text: item.Name, value: item.Id }).appendTo($('#customersForEdit'));
+                });
+            });
+    });
+
+
+    function editCustomer() {
+
+       
+        var idtest = $('hdnCustomersId').val();
+        console.log(idtest)
+
+        var IdCust = $('hdnCustomersId').val();
+        alert("Hello" + IdCust);
+        var customer = { "Id": $('hdnCustomersId').val(), "Name": $('hdnCustomersId').val(), "Longitude": $('hdnCustomersId').val(), "Latitude": $('hdnCustomersId').val() };
+        $.ajax({
+            type: "PUT",
+            //  url: "http://localhost:50169"+ customerUri,
+            url: customerUri + '/' + $('hdnCustomersId').val(),
+            contentType: "application/json",
+            data: JSON.stringify({ "customer": customer })
+        });
+    }
+
+    function editByDropDownList() {
+      
+        var id = $('#customersForEdit').val();
+        $.getJSON(customerUri + '/' + id)
+            .done(function (data) {
+         
+                $('#txtCustomerName').val(data.Name);
+                $('#txtCustomerLatitude').val(data.Latitude);
+                $('#txtCustomerLongitude').val(data.Longitude);
+                $('#hdnCustomersId').val(data.Id);
+                //document.getElementById("#txtCustomerName").value = data.Name;
+                })
+            .fail(function (jqXHR, textStatus, err) {
+                $('#txtCustomerName').text('Error: ' + err);
+            });
+    }
+
+    function formatddlItems(item) {
+        return item.Name;
+    }
+
+    function formatItem(item) {
+      return item.Name + '  :   ' + item.Latitude + '   :   '+item.Longitude;
+    }
+
+   /* function findByDropDownList() {
+        id = $('#customers').val();
+      $.getJSON(customerUri + '/' + id)
+          .done(function (data) {
+            $('#lblCustomerName').text(data.Name);
+          })
+          .fail(function (jqXHR, textStatus, err) {
+            $('#lblCustomer').text('Error: ' + err);
+          });
+    } */
+
+    function findByDropDownList() {
+        $("#lblName").empty();
+        $("#lblEmail").empty();
+        $("#lblContactNumber").empty();
+        id = $('#customers').val();
+        $.getJSON(customerContactListUri + '/' + id)
+            .done(function (data) {
+                $.each(data, function (key, item) {
+                    $('<li>', { text: item.Name }).appendTo($('#lblName'));
+                    $('<li>', { text: item.Email }).appendTo($('#lblEmail'));
+                    $('<li>', { text: item.ContactNumber }).appendTo($('#lblContactNumber'));
+                   
+                })
+                })
+            .fail(function (jqXHR, textStatus, err) {
+                $('#lblCustomer').text('Error: ' + err);
+            });
+    }
+
+    function findById() {
+        var id = $('#customerId').val();
+     //   $('#customers').val() = id;
+        $.getJSON(customerUri + '/' + id)
+            .done(function (data) {
+                $('#customer').text(formatItem(data));
+            })
+            .fail(function (jqXHR, textStatus, err) {
+                $('#customer').text('Error: ' + err);
+            });
+    }
+
+    
+</script>
